@@ -41,4 +41,5 @@ WIP
 <!--
 A quick note on detailed documentation, such as how to use the application:
 
-There are plans to 
+There are plans to switch the currently used CLI to a full GUI for improved UX. I will not write detailed documentation on how to use the application until the GUI switch is completed (to save time).
+-->
