@@ -1,0 +1,10 @@
+# CSC111 Winter 2023 Group Project
+# UofT Speedrunner: Python
+
+# Testing and code checking
+hypothesis
+pytest
+python-ta~=2.4.2
+
+# Graphics and data visualization
+folium~=0.14.0

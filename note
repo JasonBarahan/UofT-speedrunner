@@ -1,0 +1,4 @@
+AssertionError: "Building" representation invariant "self.closest_intersection is None or 
+any(self.coordinates == b.coordinates for b in self.closest_intersection.close_buildings)" was violated for instance attributes 
+{code: 'AB', name: 'Astronomy & Astrophysics', closest_intersection: <entities.Int...01B96A374CD0>, 
+amenities: {'coffee'}, coordinates: (43.660427, -79.397576)}
