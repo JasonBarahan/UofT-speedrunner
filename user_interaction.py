@@ -20,21 +20,20 @@ import load_all_data
 import map_generation as mg
 
 
-def run_path_generation(start: str, end: str, stopover: list[str] = None) -> None:
+def run_path_generation(start: str, end: str, amenities: list[str] = None) -> None:
     """
     Generate a path using the SpeedRunner.
 
     Preconditions:
     - start is a valid building code
     - end is a valid building code
-    - all elements in stopover are valid building codes
+    - all elements in amenities are valid amenity strings
     """
-    if stopover is None or len(stopover) == 0:
+    if amenities is None or len(amenities) == 0:
         mg.visualize_djikstra(start, end)
 
     else:
-        mg.visualize_djikstra_with_stopovers(start, end, stopover)
-        # mg.visualize_dfs(start, end, stopover)
+        mg.visualize_djikstra_with_stopovers(start, end, amenities)
 
 
 # IO functions
@@ -78,7 +77,7 @@ def io_get_path() -> None:
     a = load_all_data.load_data('data/building_data.csv', 'data/intersections_data.csv')
     building_codes = list(a.buildings)
     code, code2, code3 = 'a', 'a', 'a'
-    stopover = []
+    amenities = []  # List of amenity strings. For example: ['gym', 'library']
 
     # initial menu
     print('For reference, here are the building codes:')
@@ -119,35 +118,25 @@ def io_get_path() -> None:
 
     # 3: input stopovers
     print('\n')
-    print('Input any places you would like to stop over at.')
-    print('You can also put an amenity down:')
+    print('Input an amenity you would like your route to include (no quotation marks): ')
     print(str(load_all_data.AMENITIES))
-    print('Enter one of the above amenities as shown to view building options. No quotation marks please')
-    print('Press enter if you have none to add')
+    print('Or press enter if you have none to add')
     while code3 not in building_codes and code3 != '':
         code3 = input('')
 
         # no more stopovers
         if code3 == '':
             # print final info / generate path
-            print('Directions from ' + code + ' to ' + code2 + ' via ' + str(stopover))
+            print('Directions from ' + code + ' to ' + code2 + ' including ' + str(amenities))
             print('Now processing...')
-            run_path_generation(code, code2, stopover)
+            run_path_generation(code, code2, amenities)
 
         # stopover is an amenity
         elif code3 in load_all_data.AMENITIES:
-            print('Here is a list of buildings with ' + code3 + '. Pick one')
-            for key in a.buildings:
-                if code3 in a.buildings[key].amenities:
-                    print(key + ': ' + a.buildings[key].name)
-            print('Lost? Use [ctrl] + [f]')
-
-        # stopover added
-        elif code3 in building_codes:
-            stopover.append(code3)
+            amenities.append(code3)
+            print('The ' + code3 + ' amenity has been added to your request.')
+            print('Type another amenity or press enter if you are finished.')
             code3 = 'a'
-            print('Type another stopover or press enter if you have none to add (this can be an amenity'
-                  ' or a building code)')
 
         # non recognizable input
         else:
@@ -173,20 +162,20 @@ def io_show_buildings() -> None:
             print('Invalid entry. Try again')
 
 
-# if __name__ == '__main__':
-#     # for reference, these are the amenities:
-#     # 'study', 'dining', 'coffee', 'microwave', 'gym', 'library', 'atm',
-#     # 'math learning centre', 'writing centre', 'transportation'
-#
-#     import doctest
-#
-#     doctest.testmod()
-#
-#     import python_ta
-#
-#     python_ta.check_all(config={
-#         'max-line-length': 120,
-#         'disable': ['E9992', 'E9997', 'E9998', 'E9999', 'W0401', 'R1702', 'R0912']
-#     })
-#
-#     io_main_menu()
+if __name__ == '__main__':
+    # for reference, these are the amenities:
+    # 'study', 'dining', 'coffee', 'microwave', 'gym', 'library', 'atm',
+    # 'math learning centre', 'writing centre', 'transportation'
+
+    import doctest
+
+    doctest.testmod()
+
+    import python_ta
+
+    python_ta.check_all(config={
+        'max-line-length': 120,
+        'disable': ['E9992', 'E9997', 'E9998', 'E9999', 'W0401', 'R1702', 'R0912']
+    })
+
+    io_main_menu()
