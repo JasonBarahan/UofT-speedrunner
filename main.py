@@ -25,7 +25,7 @@ from python_ta.contracts import check_contracts
 from entities import *
 from concrete_grid import *
 import csv
-
+import user_interaction as io
 
 # import the csv and read data
 def load_data(building_file: str, intersection_file: str) -> AbstractGrid:
@@ -133,11 +133,14 @@ def load_data(building_file: str, intersection_file: str) -> AbstractGrid:
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
-    grid = load_data('building_data.csv', 'intersections_data.csv')
+    grid = load_data('data\\building_data.csv', 'data\intersections_data.csv')
+    io.io_main_menu()
 
-    for identifer, intersection in grid.intersections.items():
-        print(identifer, [n for n in intersection.name],
-              [b.name for b in intersection.close_buildings])
+    # debug
+    # for identifer, intersection in grid.intersections.items():
+    #     print(identifer, [n for n in intersection.name],
+    #           [b.name for b in intersection.close_buildings])
+
 
     # ## PythonTA checks
     # import python_ta

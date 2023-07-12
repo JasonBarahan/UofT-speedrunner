@@ -28,7 +28,7 @@ import entities as ent
 import load_all_data
 
 # default grid data
-DEFAULT = load_all_data.load_data('data/building_data.csv', 'data/intersections_data.csv')
+DEFAULT = load_all_data.load_data('data\\building_data.csv', 'data\intersections_data.csv')
 
 
 # ## Map generation tools ##
