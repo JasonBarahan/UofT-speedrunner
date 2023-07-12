@@ -362,47 +362,6 @@ def _visualize_complete_path(m: folium.Map, edges: list[list[ent.Edge]], start: 
 
 
 # RUNNERS
-def visualize_dfs(start: str, end: str, intermediate_stops: list[str]) -> None:
-    """
-    NO LONGER USED.
-
-    Generate a path between point A and point B, and all intermediate stops, if needed, using depth-first search.
-    Note: this always assumes the user wants to go to intermediate stops in a specific order (non-flexible).
-    Note: it is also possible for duplicates to be allowed (different classes at different times)
-
-    Preconditions:
-    - start is a valid building code
-    - end is a valid building code
-    - all elements of intermediate_stops are valid building codes
-    """
-    # datum = load_all_data.load_data('data/building_data.csv', 'data/intersections_data.csv')
-    # dfs = load_all_data.DFSGrid(datum.intersections, datum.buildings)
-    # m = generate_map("OpenStreetMap")
-    #
-    # building_data = datum.buildings
-    #
-    # # start/end building data
-    # start_building = building_data[start]
-    # end_building = building_data[end]
-    #
-    # # start/end intersection data
-    # start_intersection = start_building.closest_intersection
-    # end_intersection = end_building.closest_intersection
-    #
-    # # handle intermediate stops
-    # detour_buildings = [building_data[a] for a in intermediate_stops]
-    # detour_close_intersection_ids = [b.closest_intersection.identifier for b in detour_buildings]
-    #
-    # # generate path, increasing the max distance depending on number of stopovers
-    # max_distance = max(len(detour_buildings) * 500 + 2000, 3500)
-    # edges = dfs.find_shortest_path(start_intersection.identifier, end_intersection.identifier,
-    #                                set(detour_close_intersection_ids), max_distance)
-    # _visualize_complete_path(m, edges, start_building, end_building, detour_buildings)
-    #
-    # # output
-    # show_map(m)
-
-
 def visualize_djikstra(start: str, end: str) -> None:
     """
     Generate a path between point A and point B.
