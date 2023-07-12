@@ -40,7 +40,7 @@ class DijkstraGrid(AbstractGrid):
 
         # convert the list of intersection into a list of edges
         if not path_of_intersections:
-            print('Sorry, it seems like your destination is not reacheable :(')
+            print('Sorry, it seems like your destination is not reachable :(')
         else:
             path_with_edges = []
             for i in range(len(path_of_intersections) - 1):

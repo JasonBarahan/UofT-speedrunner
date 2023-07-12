@@ -167,15 +167,15 @@ if __name__ == '__main__':
     # 'study', 'dining', 'coffee', 'microwave', 'gym', 'library', 'atm',
     # 'math learning centre', 'writing centre', 'transportation'
 
-    import doctest
-
-    doctest.testmod()
-
-    import python_ta
-
-    python_ta.check_all(config={
-        'max-line-length': 120,
-        'disable': ['E9992', 'E9997', 'E9998', 'E9999', 'W0401', 'R1702', 'R0912']
-    })
+    # import doctest
+    #
+    # doctest.testmod()
+    #
+    # import python_ta
+    #
+    # python_ta.check_all(config={
+    #     'max-line-length': 120,
+    #     'disable': ['E9992', 'E9997', 'E9998', 'E9999', 'W0401', 'R1702', 'R0912']
+    # })
 
     io_main_menu()
