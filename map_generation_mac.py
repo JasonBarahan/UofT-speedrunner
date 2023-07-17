@@ -368,16 +368,14 @@ def _visualize_complete_path(m: folium.Map, edges: list[ent.Edge], start: ent.Bu
 # ## RUNNERS
 def visualize_djikstra(start: str, end: str) -> None:
     """
-    Generate a path between point A and point B, and all intermediate stops, if needed.
-    Note: this always assumes the user wants to go to intermediate stops in a specific order (non-flexible).
+    Generate a path between point A and point B.
     Note: it is also possible for duplicates to be allowed (different classes at different times)
 
     Preconditions:
     - start is a valid building code
     - end is a valid building code
-    - all elements of intermediate_stops are valid building codes
     """
-    datum = load_all_data.load_data('building_data.csv', 'intersections_data.csv')
+    datum = load_all_data.load_data('data/building_data.csv', 'data/intersections_data.csv')
     dji = load_all_data.DijkstraGrid(datum.intersections, datum.buildings)
     m = generate_map("OpenStreetMap")
 
@@ -391,16 +389,106 @@ def visualize_djikstra(start: str, end: str) -> None:
     start_intersection = start_building.closest_intersection
     end_intersection = end_building.closest_intersection
 
-    # generate path, increasing the max distance depending on number of stopovers
-    # max_distance = len(detour_buildings) * 1000 + 2000
-    # max_distance = 3500
-
     edges = dji.find_shortest_path(start_intersection.identifier, end_intersection.identifier)
-    _visualize_complete_path(m, edges, start_building, end_building)
+    _visualize_complete_path(m, [edges], start_building, end_building, [], [])
 
     # output
     show_map(m)
 
+
+def visualize_djikstra_with_stopovers(start: str, end: str, amenities: list[str]) -> None:
+    """
+    Re-implementation of Djikstra on July 10, 2023.
+    Generates a path from start to end, and then generates supplementary paths that 'branch' from the initial path
+    to the stopovers.
+
+    Preconditions:
+    - start is a valid building id
+    - end is a valid building id
+    - all elements of amenities are valid amenity strings
+    """
+    datum = load_all_data.load_data('data/building_data.csv', 'data/intersections_data.csv')
+    dji = load_all_data.DijkstraGrid(datum.intersections, datum.buildings)
+    m = generate_map("OpenStreetMap")
+
+    building_data = datum.buildings
+
+    # start/end building data
+    start_building = building_data[start]
+    end_building = building_data[end]
+
+    # start/end intersection data
+    start_intersection = start_building.closest_intersection
+    end_intersection = end_building.closest_intersection
+
+    main_path_edges = dji.find_shortest_path(start_intersection.identifier, end_intersection.identifier)
+
+    # Get buildings by amenity type. amenity_buildings stores their codes.
+    # Eg amenity_buildings = [['BN', 'GO', 'HH', 'VA', 'WS'], ['QPK', 'MUS', 'STG', 'SPD']] when
+    # amenities = ['gym', 'transportation'].
+    # TODO: implement such method in the Dijkstra class;ie, def get_buildings_by_amenity_type(amenity: str) -> list[str]
+    amenity_buildings = []
+    count = 0
+    for amenity in amenities:
+        amenity_buildings.append([])
+        for building_id in datum.buildings:
+            if amenity in datum.buildings[building_id].amenities:
+                amenity_buildings[count].append(building_id)
+        count += 1
+
+    # Ben's implementation of the 'branching' algorithm:
+    all_paths = [main_path_edges]  # list[list[Edge]]. Begin with the main path as the first element in the list.
+
+    # list building codes hosting amenities which are closest to main path \this is needed for generating stopovers.
+    stopovers = []
+
+    # 1. Go through each sublist.
+    # Eg: amenity_buildings = [['BN', 'GO', 'HH', 'VA', 'WS'], ['QPK', 'MUS', 'STG', 'SPD']].
+    # On the first iteration, list_of_amenity_buildings = ['BN', 'GO', 'HH', 'VA', 'WS'].
+    for list_of_amenity_buildings in amenity_buildings:
+        amenity_id_with_shortest_distance = None
+        main_intersection_id_with_shortest_distance = None
+        chosen_building = None
+        distance = math.inf
+        # 2. Go through each individual building.
+        # Eg: on the first iteration, amenity_building_code = BN.
+        for amenity_building_code in list_of_amenity_buildings:
+            amenity_building = building_data[amenity_building_code]
+            amenity_intersection = amenity_building.closest_intersection
+            amenity_id = amenity_intersection.identifier
+            # 3. Go through each edge of the main path that goes from start to end.
+            for edge in main_path_edges:
+                # 4. Check each endpoint of each edge.
+                # This way is kind of slow because we're checking each intersection (besides the first and last) twice,
+                # but that's okay. This redundancy doesn't cause bugs.
+                for intersection in edge.endpoints:
+                    distance_between_main_intersection_and_amenity \
+                        = ent.get_distance(intersection.coordinates, amenity_building.coordinates)
+                    if distance_between_main_intersection_and_amenity < distance:
+                        amenity_id_with_shortest_distance = amenity_id
+                        main_intersection_id_with_shortest_distance = intersection.identifier
+                        distance = distance_between_main_intersection_and_amenity
+                        chosen_building = amenity_building
+        optimal_path = \
+            dji.find_shortest_path(main_intersection_id_with_shortest_distance, amenity_id_with_shortest_distance)
+        all_paths.append(optimal_path)
+        stopovers.append(chosen_building)
+
+
+    # Use the code below to debug the output for amenity_buildings.
+    # print(amenity_buildings)
+    # for sublist in all_paths:
+    #     for e in sublist:
+    #         pair = ''
+    #         for i in e.endpoints:
+    #             pair += (str(i.identifier) + ' ')
+    #         print(pair)
+    #     print()
+
+    _visualize_complete_path(m, all_paths, start_building, end_building, stopovers, amenities)
+
+    # output
+    show_map(m)
 
 if __name__ == '__main__':
     # ## PythonTA checks
