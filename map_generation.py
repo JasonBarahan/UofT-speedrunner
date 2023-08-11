@@ -1,15 +1,11 @@
-# TODO: run PYTA checks
-# TODO: get Djikstra to work (>:C) then integrate with vis functions
-# TODO: general code review
-
 """
 UofT Speedrunner
 
 Module Description
 ==================
-This module contains functions used to generate complete maps using Folium.
-Completed maps include UofT buildings, intersections on campus, and paths connecting
-the two.
+This module contains functions used to generate complete maps using Folium on Windows devices.
+A separate map_generation_mac.py contains the corresponding code for macOS.
+The completed maps include UofT buildings, intersections on campus, and paths connecting them.
 
 Copyright and Usage Information
 ===============================
@@ -34,7 +30,7 @@ import math
 DEFAULT = load_all_data.load_data('data/building_data.csv', 'data/intersections_data.csv')
 
 
-# ## Map generation tools ##
+## Map generation tools ##
 def generate_map(tiles: str, location: list[float] = (43.66217731498653, -79.39539894245203)) -> folium.Map:
     """
     Generate a Folium map object centered at the University of Toronto.
@@ -123,7 +119,7 @@ def generate_all_intersection_points(grid: ent.AbstractGrid = DEFAULT) -> None:
     for i in range(1, len(data) + 1):
         # get names
         name_data = list(data[i].name)
-        name_data.sort()                         # intersection name is a set
+        name_data.sort()  # intersection name is a set
         if len(name_data) < 2:
             name_data.append(name_data[0])
         st = name_data[0] + ' @ ' + name_data[1]
@@ -153,7 +149,7 @@ def generate_all_intersection_points(grid: ent.AbstractGrid = DEFAULT) -> None:
 def generate_all_intersection_points_with_edges(grid: ent.AbstractGrid = DEFAULT,
                                                 ids: list[int] = None) -> None:
     """
-    Generate all intersection points with edges shown
+    Generate all intersection points with edges shown.
     """
     data = grid.intersections
     names = []
@@ -199,10 +195,8 @@ def generate_all_intersection_points_with_edges(grid: ent.AbstractGrid = DEFAULT
     show_map(m)
 
 
-# ## individual point generation mechanisms for buildings and intersections ##
-# ## these require a map to be generated                                    ##
-# ## individual point generation mechanisms for buildings and intersections ##
-# ## these require a map to be generated                                    ##
+## individual point generation mechanisms for buildings and intersections ##
+## these require a map to be generated                                    ##
 def _generate_single_building(m: folium.Map, building: ent.Building, point: str | int, data: str = '') -> None:
     """
     Add a single building point to the given map.
@@ -292,7 +286,6 @@ def _visualize_path(m: folium.Map, edges: list[ent.Edge]) -> None:
         points = [[endpoint_1.coordinates[0], endpoint_1.coordinates[1]],
                   [endpoint_2.coordinates[0], endpoint_2.coordinates[1]]]
 
-        # TODO: remove debug
         str2 = 'id: ', endpoint_1.identifier, points[0], 'other intersection: ', \
             endpoint_2.identifier, points[1]
         print(str2)
@@ -306,8 +299,6 @@ def _visualize_intermediary_paths(m: folium.Map, edges: list[ent.Edge], intersec
     Visualizes intermediary paths and their intersections.
     """
     intersections_so_far = intersections
-    # # intermediary intersections and final intersection
-    # - get other endpoint
 
     path_num = 2
     for edge in edges:
@@ -360,9 +351,8 @@ def _visualize_complete_path(m: folium.Map, edges: list[list[ent.Edge]], start: 
             stopover_counter += 1
 
     # plot intersections in order
-    # # first intersection
+    # first intersection
     _generate_single_intersection(m, start.closest_intersection, 1)
-    # intersections_so_far.append(start.closest_intersection)
 
     # map a path from start building to first intersection
     start_closest_intersection_coords = start.closest_intersection.coordinates
@@ -398,33 +388,23 @@ def _visualize_complete_path(m: folium.Map, edges: list[list[ent.Edge]], start: 
                 _visualize_intermediary_paths(m, path, [add_intersection])
 
 
-    # map paths to intermediate buildings
-    # if intermediate_stops is None:
-    #     pass
-    # else:
-    #     for stop in intermediate_stops:
-    #         intm_closest_intersection_coords = stop.closest_intersection.coordinates
-    #         points_m = [[intm_closest_intersection_coords[0], intm_closest_intersection_coords[1]],
-    #                     [stop.coordinates[0], stop.coordinates[1]]]
-    #
-    #         folium.PolyLine(points_m, color="red", weight=2.5, opacity=1).add_to(m)
-
-
 # ## RUNNERS
 def visualize_djikstra(start: str, end: str) -> None:
     """
-    Generate a path between point A and point B.
-    Note: it is also possible for duplicates to be allowed (different classes at different times)
+    Generate and visualize a path between point A and point B.
+    Note: in the final visualization of the path it is also possible for duplicates to be allowed,
+    as this represent that a student may have different classes at different times and the optimal path between
+    each of them may make use of an intersaction used "previously during the day".
 
     Preconditions:
     - start is a valid building code
     - end is a valid building code
     """
-    datum = load_all_data.load_data('data/building_data.csv', 'data/intersections_data.csv')
+    datum = DEFAULT
     dji = load_all_data.DijkstraGrid(datum.intersections, datum.buildings)
     m = generate_map("OpenStreetMap")
 
-    building_data = datum.buildings
+    building_data = datum.buildings  # dict[str, Building]
 
     # start/end building data
     start_building = building_data[start]
@@ -452,11 +432,11 @@ def visualize_djikstra_with_stopovers(start: str, end: str, amenities: list[str]
     - end is a valid building id
     - all elements of amenities are valid amenity strings
     """
-    datum = load_all_data.load_data('data/building_data.csv', 'data/intersections_data.csv')
-    dji = load_all_data.DijkstraGrid(datum.intersections, datum.buildings)
+    data = DEFAULT
+    dji = load_all_data.DijkstraGrid(data.intersections, data.buildings)
     m = generate_map("OpenStreetMap")
 
-    building_data = datum.buildings
+    building_data = data.buildings  # dict[str, Building]
 
     # start/end building data
     start_building = building_data[start]
@@ -466,26 +446,24 @@ def visualize_djikstra_with_stopovers(start: str, end: str, amenities: list[str]
     start_intersection = start_building.closest_intersection
     end_intersection = end_building.closest_intersection
 
+    amenity_buildings = get_buildings_by_amenity_type(amenities)
     main_path_edges = dji.find_shortest_path(start_intersection.identifier, end_intersection.identifier)
-
-    # Get buildings by amenity type. amenity_buildings stores their codes.
-    # Eg amenity_buildings = [['BN', 'GO', 'HH', 'VA', 'WS'], ['QPK', 'MUS', 'STG', 'SPD']] when
-    # amenities = ['gym', 'transportation'].
-    # TODO: implement such method in the Dijkstra class;ie, def get_buildings_by_amenity_type(amenity: str) -> list[str]
-    amenity_buildings = []
-    count = 0
-    for amenity in amenities:
-        amenity_buildings.append([])
-        for building_id in datum.buildings:
-            if amenity in datum.buildings[building_id].amenities:
-                amenity_buildings[count].append(building_id)
-        count += 1
-
-    # Ben's implementation of the 'branching' algorithm:
     all_paths = [main_path_edges]  # list[list[Edge]]. Begin with the main path as the first element in the list.
 
     # list building codes hosting amenities which are closest to main path \this is needed for generating stopovers.
     stopovers = []
+
+    if main_path_edges:
+        main_path_intersections = edge_to_intersection_path(main_path_edges)
+        print(len(main_path_edges))
+        print(len(main_path_intersections))
+    else:
+        # In this case, the path contains no edges.
+        # This means that the start and end building have a common closest intersection,
+        # which is used as the only "middle point" in the path
+        assert building_data[start].closest_intersection == building_data[end].closest_intersection
+        # At this point, we can represent the path solely as the closest intersection.
+        main_path_intersections = [building_data[start].closest_intersection]
 
     # 1. Go through each sublist.
     # Eg: amenity_buildings = [['BN', 'GO', 'HH', 'VA', 'WS'], ['QPK', 'MUS', 'STG', 'SPD']].
@@ -501,15 +479,11 @@ def visualize_djikstra_with_stopovers(start: str, end: str, amenities: list[str]
             amenity_building = building_data[amenity_building_code]
             amenity_intersection = amenity_building.closest_intersection
             amenity_id = amenity_intersection.identifier
-            # 3. Go through each edge of the main path that goes from start to end.
-            for edge in main_path_edges:
-                # 4. Check each endpoint of each edge.
-                # This way is kind of slow because we're checking each intersection (besides the first and last) twice,
-                # but that's okay. This redundancy doesn't cause bugs.
-                for intersection in edge.endpoints:
-                    distance_between_main_intersection_and_amenity \
-                        = ent.get_distance(intersection.coordinates, amenity_building.coordinates)
-                    if distance_between_main_intersection_and_amenity < distance:
+            # 3. Go through each intersection of the main path that goes from start to end.
+            for intersection in main_path_intersections:
+                distance_between_main_intersection_and_amenity \
+                                 = ent.get_distance(intersection.coordinates, amenity_building.coordinates)
+                if distance_between_main_intersection_and_amenity < distance:
                         amenity_id_with_shortest_distance = amenity_id
                         main_intersection_id_with_shortest_distance = intersection.identifier
                         distance = distance_between_main_intersection_and_amenity
@@ -519,38 +493,57 @@ def visualize_djikstra_with_stopovers(start: str, end: str, amenities: list[str]
         all_paths.append(optimal_path)
         stopovers.append(chosen_building)
 
-
-    # Use the code below to debug the output for amenity_buildings.
-    # print(amenity_buildings)
-    # for sublist in all_paths:
-    #     for e in sublist:
-    #         pair = ''
-    #         for i in e.endpoints:
-    #             pair += (str(i.identifier) + ' ')
-    #         print(pair)
-    #     print()
-
     _visualize_complete_path(m, all_paths, start_building, end_building, stopovers, amenities)
 
     # output
     show_map(m)
 
+
+def get_buildings_by_amenity_type(amenities: list[str]) -> list[list[str]]:
+    """Return the buildings providing the given amenities.
+    In the returned list, each sublist at a given index corresponds to the buildings that provide
+    the amenity listed at the same index in amenities.
+
+    Eg. amenity_buildings = [['BN', 'GO', 'HH', 'VA', 'WS'], ['QPK', 'MUS', 'STG', 'SPD']] when
+    amenities = ['gym', 'transportation'].
+    """
+    building_data = DEFAULT.buildings
+    amenity_buildings = []
+    count = 0
+    for amenity in amenities:
+        amenity_buildings.append([])
+        for building_id in building_data:
+            if amenity in building_data[building_id].amenities:
+                amenity_buildings[count].append(building_id)
+        count += 1
+
+    return amenity_buildings
+
+
+def edge_to_intersection_path(edges: list[ent.Edge]) -> list[ent.Intersection]:
+    """Given a list of edges of a path, return the same path expressed in terms of the corresponding intersections.
+
+    Preconditions:
+     - edges != []
+    """
+    if len(edges) == 1:
+        return list(edges[0].endpoints)
+    else:
+        first_endpoints = edges[0].endpoints
+        second_endpoints = edges[1].endpoints
+        first_intersection = list(first_endpoints.difference(second_endpoints))[0]
+
+        # Now that we found the actual first intersection, we can iterate through the edges to find the path
+        path_so_far = [first_intersection]
+        for edge in edges:
+            other_endpoint = edge.get_other_endpoint(path_so_far[-1])
+            path_so_far.append(other_endpoint)
+
+        return path_so_far
+
+
+
 if __name__ == '__main__':
-    # ## PythonTA checks
-    # import python_ta
-    # python_ta.check_all(config={
-    #     'max-line-length': 120,
-    #     'extra-imports': [],
-    #     'allowed-io': []
-    # })
 
-    a = load_all_data.load_data('building_data.csv', 'intersections_data.csv')
+    a = load_all_data.load_data('data/building_data.csv', 'data/intersections_data.csv')
     generate_all_intersection_points_with_edges(a)
-    # generate_all_building_points(a)
-
-    # start2 = 'MY'
-    # end2 = 'WB'
-    # detours2 = []
-    #
-    # runner_dfs(start2, end2, detours2)
-    # runner_djikstra(start2, end2, detours2)

@@ -24,15 +24,17 @@ from concrete_grid import *
 
 # import the csv and read data
 def load_data(building_file: str, intersection_file: str) -> AbstractGrid:
-    """Load in data on all the buildings from a csv file and all the intersections from another csv file.
-      This function will also create an AbstractGrid object using the buildings and intersections given, and will update
-      the closest_intersection instance attribute in every building object, and the close_buildings instance attribute
-      in every intersection object.
+    """
+    Load in data on all the buildings from data/building_data.csv and all the intersections from
+    data/interasection_data.csv.
+    This function will also create an AbstractGrid object using the buildings and intersections given, and will update
+    the closest_intersection instance attribute in every building object, and the close_buildings instance attribute
+    in every intersection object according to the datasets provided.
 
-      Preconditions:
-          - building_file is the path to a csv file in the format of the provided building_data.csv
-          - intersection_file is the path to a csv file in the format of the provided intersection_data.csv
-      """
+    Preconditions:
+      - building_file is the path to a csv file in the format of the provided building_data.csv
+      - intersection_file is the path to a csv file in the format of the provided intersection_data.csv
+    """
     # loading in buildings
     buildings_dict = load_buildings(building_file)
 
@@ -64,7 +66,7 @@ def load_data(building_file: str, intersection_file: str) -> AbstractGrid:
 
 def load_buildings(building_file: str) -> dict[str, Building]:
     """Helper method to load in buildings as objects from building file, and save buildings as a dict
-    with the key: value form of buildings's code: building's object
+    with the key: value form of building's code: building's object
 
     Preconditions:
         - building_file is the path to a csv file in the format of the provided building_data.csv
@@ -87,8 +89,8 @@ def load_buildings(building_file: str) -> dict[str, Building]:
 
 def load_intersections(intersection_file: str) -> tuple[list, dict[int, Intersection]]:
     """Helper method to load in intersections as objects from intersections file, and save intersections as a dict
-    with the key: value form of intersection's integer id: intersection's object; and also return a list from our
-    intersection rows from the intersection file
+    with the key: value form of intersection's integer id: intersection's object;
+    Return a list from our intersection rows from the intersection file
 
     Preconditions:
         - intersection_file is the path to a csv file in the format of the provided intersection_data.csv"""
@@ -125,10 +127,3 @@ if __name__ == '__main__':
     import doctest
 
     doctest.testmod()
-
-    # import python_ta
-    #
-    # python_ta.check_all(config={
-    #     'max-line-length': 120,
-    #     'disable': ['E9992', 'E9997', 'E9998', 'E9999', 'W0401']
-    # })

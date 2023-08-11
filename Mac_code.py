@@ -1,4 +1,6 @@
-"""Code Snippet for what to replace default code with for Macs"""
+"""This module contains the code needed to visualize and interact with a
+working UI on macOS.
+"""
 import folium
 import os
 import webbrowser
@@ -6,7 +8,6 @@ import pandas as pd
 
 
 # This is all default code to test
-
 fmap = folium.Map(
         location=(43.66217731498653, -79.39539894245203),
         tiles="OpenStreetMap",
@@ -28,12 +29,7 @@ for i in range(0, len(data)):
 
    ).add_to(fmap)
 
-# Jason's default code to show the map in the browser:
-
-# fmap.show_in_browser()
-
-# Macbook version that works for me
-# (basically this works by replacing every instance of the above singular line of code with this instead):
+# This code is different on macOS
 filename = 'Map.html'
 fmap.save(filename)
 

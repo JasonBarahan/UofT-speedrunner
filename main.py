@@ -26,10 +26,3 @@ if __name__ == '__main__':
     doctest.testmod()
 
     ui.io_main_menu()
-
-    #import python_ta
-
-    #python_ta.check_all(config={
-    #    'max-line-length': 120,
-    #    'disable': ['E9992', 'E9997', 'E9998', 'E9999', 'W0401']
-    #})

@@ -3,12 +3,14 @@ UofT Speedrunner
 
 Module Description
 ==================
-This file contains entities used to represent various features of the map in
-terms of graphs. Buildings and intersections are represented as nodes, while
-paths between these buildings and intersections are represented as edges.
-These are represented using an AbstractGrid object which can be further used
-to find nearby buildings from a given intersection, and shortest paths
-between two buildings.
+This file contains entities used to build a meaningful graph in our problem domain.
+The entities we used are: Building, Intersection, Edge and AbstractGrid, parent class of the different
+concrete grids (see concrete_grid.py).
+The Intersections are the nodes in the graph we are using to represent our enhanced UofT map, and they are
+connected by Edges, which represent the segment of street connecting two intersections.
+Important UofT buildings are also featured on the map.
+AbstractGrid is an object used to represent the graph as a whole, and is the main "map" object, which can be
+further used to find nearby buildings from a given intersection, and shortest paths between two buildings.
 
 Copyright and Usage Information
 ===============================
@@ -32,25 +34,24 @@ AMENITIES = {
 }
 
 
-# @check_contracts
 class Building:
     """
-      A class for the buildings within the UofT campus.
+    A class for the buildings within the UofT campus.
 
-      Instance Attributes:
+    Instance Attributes:
       - code: a string containing a two-letter unique building
         identifier
       - closest_intersection: the Intersection closest to the building's
         main entrance
-      - amenities: a list of strings specifying amenities available.
+      - amenities: a list of strings specifying amenities available in the building.
       - coordinates: a tuple consisting of (longitude, latitude)
 
-      Representation Invariants:
-       - self.code is a valid building code
-       - all(a in AMENITIES for a in self.amenities)
-       - self.closest_interaction is None or any(self.coordinates == b.coordinates
+    Representation Invariants:
+      - self.code is a valid building code
+      - all(a in AMENITIES for a in self.amenities)
+      - self.closest_interaction is None or any(self.coordinates == b.coordinates
         for b in self.closest_intersection.close_buildings)
-      """
+    """
     code: str
     name: str
     closest_intersection: Optional[Intersection]
@@ -68,10 +69,10 @@ class Building:
         self.coordinates = coordinates
 
 
-# @check_contracts
 class Intersection:
     """
-      A class for the intersections (nodes) within the UofT campus.
+    A class for the intersections (nodes) within the UofT campus.
+    Each Intersection object represent a relevant intersection between two or more streets on the UofT campus.
 
       Instance Attributes:
       - identifier: intersection id
@@ -95,9 +96,9 @@ class Intersection:
         """
         Initialize an intersection object.
 
-        close_buildings is EMPTY as we are determining the close buildings
-        after the fact.
-        edges is EMPTY as adjacent intersections will be determined after-the-fact.
+        Note:
+        - close_buildings is initialized EMPTY as we are determining the close buildings after-the-fact.
+        - edges is EMPTY as adjacent intersections will be determined after-the-fact.
         """
         self.identifier = identifier
         self.name = name
@@ -107,9 +108,11 @@ class Intersection:
 
     def find_all_paths(self, destination_id: int, visited: set[Intersection],
                        max_distance: int) -> list[list[Edge]]:
-        """Finds all the paths from self to destination_id.
+        """
+        Finds all the paths from self to destination_id.
         When you call this method for the first time, destination_id is the id of the node you want to get to and
-        visited should be an empty set."""
+        visited should be an empty set.
+        """
 
         all_paths_so_far = []
         self._find_all_paths_helper(destination_id, visited, [],
@@ -157,11 +160,11 @@ class Intersection:
         return None  # this should never be reached
 
 
-# @check_contracts
 class Edge:
     """
-      The 'roadway' connecting two Intersections.
-      Edges are weighted by travel time between Intersections.
+      The 'roadway' connecting two Intersections. Each edge represents the segment of a given street
+      connecting the two Intersections, which act as its endpoints in the graph representation.
+      Edges are weighted by the real-life distance between Intersections.
 
       Instance Attributes:
       - endpoints: the Intersections an edge connects
@@ -193,10 +196,10 @@ class Edge:
         return (self.endpoints - {intersection}).pop()
 
 
-# @check_contracts
 class AbstractGrid:
     """
-    The map of U of T.
+    An abstract class representing the map of UofT.
+    It brings together all intersections as nodes, and buildings as features located on the map.
 
     Instance Attributes:
     - intersections: dict of intersections (key: intersection ID. value: Intersection object)
@@ -212,10 +215,8 @@ class AbstractGrid:
         self.buildings = buildings
 
     def find_closest_intersection(self, building_code: str) -> int:
-        """Finds the intersection with the closest Euclidean distance to that of the building.
-        Used for the initialization of all buildings.
-        Input: The building code.
-        Output: The ID of the intersection.
+        """Finds and returns the ID of the intersection with the closest Euclidean distance to that of the building
+        of the given building code. Used for the initialization of all buildings.
         """
         closest_so_far = None
         closest_distance = None
@@ -235,7 +236,7 @@ class AbstractGrid:
         return closest_so_far
 
     def find_close_buildings(self, identifier: int) -> set[str]:
-        """Return a set of the codes of the buildings closest to a given intersection.
+        """Return a set of the codes of the buildings that have this intersection as their closest intersection.
         MUST be run AFTER calling self.find_closest_intersection() on all buildings.
         """
         intersection = self.intersections[identifier]
@@ -249,7 +250,8 @@ class AbstractGrid:
 
     def find_shortest_path(self, id1: int,
                            id2: int) -> list[Intersection]:
-        """Return the shortest path between the two given intersections
+        """Abstract method that returns the shortest path between the two given intersections.
+        Implemented in the concrete classes, as it depends on the algorithm employed.
 
         Preconditions:
          - id1 in self.intersections
@@ -261,7 +263,7 @@ class AbstractGrid:
 def get_distance(p1: tuple[float, float], p2: tuple[float, float]) -> float:
     """Calculate the distance between two points on Earth, given its latitude and
     longitude coordinates.
-    Assume the Earth is perfectly spherical
+    Assume the Earth is perfectly spherical.
     """
     lat1, long1 = p1
     lat2, long2 = p2
@@ -281,10 +283,3 @@ if __name__ == '__main__':
     import doctest
 
     doctest.testmod()
-
-    import python_ta
-
-    python_ta.check_all(config={
-        'max-line-length': 120,
-        'disable': ['E9992', 'E9997', 'E9999', 'R0913']
-    })

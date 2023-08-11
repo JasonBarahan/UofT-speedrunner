@@ -8,3 +8,6 @@ python-ta~=2.4.2
 
 # Graphics and data visualization
 folium~=0.14.0
+
+# Data manipulation
+pandas

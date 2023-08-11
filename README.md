@@ -6,7 +6,8 @@
 </div>
 
 <h3>Introduction</h3>
-The <i>UofT Speedrunner</i> is a program for students of the University of Toronto to navigate their way around campus. This application finds the most optimal path between two buildings - and determines nearby amenities should people need them.
+The <i>UofT Speedrunner</i> is a program for students of the University of Toronto to navigate their way around campus. This application finds the optimal route between two buildings accounting for common amenities needed by students, such  as coffee shops and dining areas.
+You need to get from your dorm to your class, while grabbing a coffee and a sandwich for lunch? No problem, we have you covered! <i>UofT Speedrunner</i> will find the shortest route that allows you to accomplish everything in a tight timeframe!
 
 <h5>Compatible devices</h5>
 The program currently functions for Windows and MacOS devices.
@@ -15,12 +16,13 @@ We plan to add support for UNIX-based devices and mobile devices very soon.
 
 <h3>Features</h3>
 <ul>
-    <li>Navigate between two buildings on campus!</li>
-    <li>Find buildings with certain amenities on campus!</li>
+    <li>Navigate between two buildings on campus</li>
+    <li>Find buildings with certain amenities on campus</li>
     <li>Determine multi-stop paths.</li>
 </ul>
 
 <h3>Use cases</h3>
+Here we have some examples:
 <ul>
     <li>Determining an optimal path between Myhal Centre and Mining Building while stopping by buildings with an ATM and a coffee shop.</li>
     <li>Determining an optimal path between St. George Station and Wallberg Building while stopping by Sidney Smith Commons.</li>

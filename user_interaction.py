@@ -3,7 +3,7 @@ UofT Speedrunner
 
 Module Description
 ==================
-Simplified text-based interaction with program using Python input/output.
+This module implements a simplified text-based interaction with program using Python input/output.
 
 Copyright and Usage Information
 ===============================
@@ -31,7 +31,6 @@ def run_path_generation(start: str, end: str, amenities: list[str] = None) -> No
     """
     if amenities is None or len(amenities) == 0:
         mg.visualize_djikstra(start, end)
-
     else:
         mg.visualize_djikstra_with_stopovers(start, end, amenities)
 
@@ -39,7 +38,8 @@ def run_path_generation(start: str, end: str, amenities: list[str] = None) -> No
 # IO functions
 def io_main_menu() -> None:
     """
-    input output interface
+    Manage the main in input/output interface, by asking the user which feature of
+    UofT Speedrunner they would like to use.
     """
     string = 0
     print('Welcome to UofT Speedrunner!')
@@ -72,6 +72,8 @@ def io_main_menu() -> None:
 def io_get_path() -> None:
     """
     CLI IO handling for getting a desired shortest path.
+    Asks te user for their starting point and final destination,
+    as well as any potential stopovers.
     """
     # get building data
     a = load_all_data.load_data('data/building_data.csv', 'data/intersections_data.csv')
@@ -170,12 +172,3 @@ if __name__ == '__main__':
     import doctest
 
     doctest.testmod()
-
-    import python_ta
-
-    python_ta.check_all(config={
-        'max-line-length': 120,
-        'disable': ['E9992', 'E9997', 'E9998', 'E9999', 'W0401', 'R1702', 'R0912']
-    })
-
-    io_main_menu()

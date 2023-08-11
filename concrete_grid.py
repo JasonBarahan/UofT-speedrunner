@@ -3,10 +3,12 @@ UofT Speedrunner
 
 Module Description
 ==================
-This file contains classes for the concrete grids being used for our various path-finding algorithms used throughout our
-program, as well as entities for PriorityQueue, which is required for our implementation of one of our algorithms. There
-is a class for a grid created using depth-first search, and a class for another grid created using an implementation of
-Djikstra's algorithm.
+This module contains the concrete classes (Concrete Grids) inheriting from AbstractGrid, each implementing
+its graph searching algorithm. Additionally, the module contains other data structures such as Priority Queues needed
+for the implementation of such algorithms.
+There are two concrete classes:
+- DFSGrid, which implements a depth-first search algorithm
+- DijkstraGrid, whcih implements Dijkstra's algorithm
 
 Copyright and Usage Information
 ===============================
@@ -38,6 +40,9 @@ class DFSGrid(AbstractGrid):
         """Find the shortest path between two intertersections in the grid (using DFS) while accounting for
         any intermediate and unordered intersections along the way.
 
+        The optimal (shortest) path is defined as the list of edges with the least sum of their edge.distance attribute,
+        representing the shortest possible walking distance to get from the start to the destination.
+
         If no path exists that traverses through *all* intermediate intersections in an allotted total distance length,
         a path list will be returned that goes through as many as possible. *
 
@@ -53,7 +58,7 @@ class DFSGrid(AbstractGrid):
           a path cannot be found under the given max_distance. To fix this, try increasing the max_distance parameter
           by increments of 500m until a path is returned.
 
-        * Not implemented yet TODO: Can someobody check what this line beside me means? idk
+        * Not implemented yet *
         """
         # 1. Store all the paths (under a certain total distance) in a single list.
         start_intersection = self.intersections[id1]
@@ -91,7 +96,10 @@ class DFSGrid(AbstractGrid):
 
 
 class DijkstraGrid(AbstractGrid):
-    """Grid algorithms implemented using the Dijkstra algorithm."""
+    """
+    A concrete class for AbstractGrid.
+    It finds the shortest path between two buildings using Dijkatra's Algorithm.
+    """
 
     def __init__(self, intersections: dict[int, Intersection],
                  buildings: dict[str, Building]) -> None:
@@ -100,9 +108,11 @@ class DijkstraGrid(AbstractGrid):
 
     def find_shortest_path(self, id1: int, id2: int) -> list[Edge]:
         """Find the shortest path between two intertersections in the Dijkstra Grid.
+        The optimal (shortest) path is defined as the list of edges with the least sum of their edge.distance attribute,
+        representing the shortest possible walking distance to get from the start to the destination.
         We treat #1 as the START and #2 as the END.
         Input: The identifiers of the two intersections.
-        Output: All intersections, in order, to visit (including intersection1 and intersection 2).
+        Output: The edges connecting all intersections, in order, to visit (including intersection1 and intersection 2).
         """
         path_of_intersections = self.find_path_dijkstra(id1, id2)
 
@@ -112,17 +122,16 @@ class DijkstraGrid(AbstractGrid):
         else:
             path_with_edges = []
             for i in range(len(path_of_intersections) - 1):
-                first_intersection = self.intersections[
-                    path_of_intersections[i]]
-                second_intersection = self.intersections[path_of_intersections[
-                    i + 1]]
+                first_intersection = self.intersections[path_of_intersections[i]]
+                second_intersection = self.intersections[path_of_intersections[i + 1]]
                 edge = first_intersection.find_edge(second_intersection)
                 path_with_edges.append(edge)
             return path_with_edges
 
     def find_path_dijkstra(self, id1: int, id2: int) -> list[int]:
-        """Method that calculates the most optimal path from id1 to id2 using an implementation of Dijkstra's
-        algorithm. This implementation uses a Priority Queue, and some minor adjustments have been made in the base
+        """Finds the optimal path from id1 to id2 using an implementation of Dijkstra's algorithm.
+        This method returns the IDs of all Intersections that must be visited to obtain the shortest path.
+        This implementation uses a Priority Queue, and some minor adjustments have been made in the base
         logic of the algorithm to practically accomodate for our code and purposes (further details in the report)
         """
         source = self.intersections[id1]  # source is the intersection object corresponding to integer id1
@@ -222,30 +231,9 @@ class _PriorityQueue:
 
     def enqueue(self, distance: float, item_id: int, prev_id: int) -> None:
         """Add the given item with the given priority to this priority queue.
-        # >>> q = _PriorityQueue()
-        # >>> q.enqueue(9, 'A')
-        # >>> q.enqueue(5, 'B')
-        # >>> q.enqueue(3, 'C')
-        # >>> q.enqueue(1, 'D')
-        # >>> q._items
-        # [(9, 'A'), (5, 'B'), (3, 'C'), (1, 'D')]
-        # >>> q.enqueue(4, 'E')
-        # >>> q._items
-        # [(9, 'A'), (5, 'B'), (4, 'E'), (3, 'C'), (1, 'D')]
-        # >>> q.dequeue()
-        # 'D'
-        # >>> q._items
-        # [(9, 'A'), (5, 'B'), (4, 'E'), (3, 'C')]
         """
-
-        # (0, 1, None)
-        # (inf, 2, 1)
-
-        # (inf, 1, 47)
-        # (inf, 2, 47)
-
-        i = len(self._items) - 1   # getting index of last item
-        while i >= 0 and self._items[i][0] < distance:  # ADDED THE EQUALS
+        i = len(self._items) - 1  # getting index of last item
+        while i >= 0 and self._items[i][0] < distance:
             # Loop invariant: all items in self._items[0:i]
             # have a lower priority than <priority>.
             i -= 1
@@ -264,13 +252,13 @@ class _PriorityQueue:
             return item_id
 
     def __contains__(self, item_id: int) -> bool:
-        """Check if contained in Priority Queue.
+        """Check if the item with the given ID is contained in Priority Queue.
         """
         items = [i[1] for i in self._items]
         return item_id in items
 
     def remove(self, item_id: int) -> int:
-        """Remove and return a specific item."""
+        """Remove and return a specific item, regarless of its priority in the queue"""
         ids = [j[1] for j in self._items]
         i = ids.index(item_id)
         return self._items.pop(i)[1]
@@ -280,10 +268,3 @@ if __name__ == '__main__':
     import doctest
 
     doctest.testmod()
-
-    # import python_ta
-    #
-    # python_ta.check_all(config={
-    #     'max-line-length': 120,
-    #     'disable': ['E9992', 'E9997', 'E9999', 'E9969', 'R1702', 'E9998', 'R1710', 'R0914']
-    # })
