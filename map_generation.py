@@ -197,6 +197,36 @@ def generate_all_intersection_points_with_edges(grid: ent.AbstractGrid = DEFAULT
 
 ## individual point generation mechanisms for buildings and intersections ##
 ## these require a map to be generated                                    ##
+def _get_icon_data(data: str) -> str:
+    """
+    Determine the icon to display for building stopovers.
+    """
+    # this uses matching which is akin to switch statement. Added in Python 3.10
+    match data:
+        case 'study':
+            return 'chalkboard-user'        # chalkboard with person in front
+        case 'dining':
+            return 'burger'
+        case 'coffee':
+            return 'mug-hot'
+        case 'microwave':
+            return 'calendar-week'          # closest available icon which resembles a microwave
+        case 'gym':
+            return 'dumbbell'
+        case 'library':
+            return 'book'
+        case 'atm':
+            return 'money-bills'            # atms are cash dispensers
+        case 'math learning centre':
+            return 'plus-minus'             # plus minus symbol
+        case 'writing centre':
+            return 'pencil'
+        case 'transportation':
+            return 'train-subway'
+        case _:
+            return 'pause'              # default stopover icon
+
+
 def _generate_single_building(m: folium.Map, building: ent.Building, point: str | int, data: str = '') -> None:
     """
     Add a single building point to the given map.
@@ -208,6 +238,7 @@ def _generate_single_building(m: folium.Map, building: ent.Building, point: str 
     lat = building.coordinates[0]
     lon = building.coordinates[1]
     amenity_data = building.amenities
+    get_icon = _get_icon_data(data)
 
     # place additional context string data in brackets
     if data != '':
@@ -223,13 +254,13 @@ def _generate_single_building(m: folium.Map, building: ent.Building, point: str 
 
     # modify data depending on start/end/intermediary building classifications
     if point == "START":
-        icon_data = folium.Icon(color='red', icon='play', prefix='fa')
+        icon_data = folium.Icon(color='blue', icon='play', prefix='fa')
         name_data = name + data
     elif point == "END":
         icon_data = folium.Icon(color='green', icon='flag-checkered', prefix='fa')
         name_data = name + data
     elif isinstance(point, int):
-        icon_data = folium.Icon(color='purple', icon='pause', prefix='fa')
+        icon_data = folium.Icon(color='purple', icon=get_icon, prefix='fa')
         name_data = 'STOPOVER ' + str(point) + ': ' + name + data
     else:
         raise Exception("You found a bug! Send us a message and we'll give you a cookie in exchange.")
