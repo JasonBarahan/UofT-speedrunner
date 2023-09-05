@@ -10,7 +10,7 @@ The <i>UofT Speedrunner</i> is a program for students of the University of Toron
 You need to get from your dorm to your class, while grabbing a coffee and a sandwich for lunch? No problem, we have you covered! <i>UofT Speedrunner</i> will find the shortest route that allows you to accomplish everything in a tight timeframe!
 
 <h5>Compatible devices</h5>
-The program currently functions for Windows and MacOS devices. UNIX-based and mobile devices are not supported (yet!)
+The program currently functions for Windows and MacOS devices. Other UNIX-based and mobile devices are not supported (yet!)
 
 <h3>Features</h3>
 <ul>
@@ -32,7 +32,7 @@ Some reasons why you might want to use this program:
     <li>Visualizations depend on Folium, which works only on MacOS and Windows.</li>
     <li>Paths generated depend on intersections being identified by the program. Faster paths using non-recognized intersections will not be featured.</li>
     <li>This application does not provide navigation for the Mississauga or Scarborough campus, nor does it provide directions between buildings on different campuses. (sorry!)</li>
-    <li>UNIX-based and mobile devices are not supported (yet!)</li>
+    <li>Most UNIX-based and mobile devices are not supported (yet!)</li>
 </ul>
 
 <h3><a href='https://github.com/JasonBarahan/speedrunner/wiki'>Documentation</a></h3>
